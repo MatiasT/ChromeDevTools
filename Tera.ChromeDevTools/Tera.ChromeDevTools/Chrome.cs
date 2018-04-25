@@ -44,7 +44,9 @@ namespace Tera.ChromeDevTools
             {
                 var remoteSessions = await webClient.GetStringAsync("/json");
                 var validSessions = new List<string>();
-                foreach (var item in JsonConvert.DeserializeObject<ICollection<ChromeSessionInfo>>(remoteSessions))
+                foreach (var item in JsonConvert.DeserializeObject<ICollection<ChromeSessionInfo>>(remoteSessions)
+                    .Where(s=>s.Type=="page")
+                    )
                 {
                     validSessions.Add(item.Id);
                     if (!aliveSessions.ContainsKey(item.Id))
@@ -79,6 +81,7 @@ namespace Tera.ChromeDevTools
 
         public async Task CloseSession(ChromeSession session)
         {
+            //TODO(Tera):if i close all the sessions, chrome closes itself! i can use this to gracefully close this stuff, OR maybe i should prevent it?
             using (var webClient = GetDebuggerClient())
             {
                 var result = await webClient.PostAsync("/json/close/" + session.Id, null);

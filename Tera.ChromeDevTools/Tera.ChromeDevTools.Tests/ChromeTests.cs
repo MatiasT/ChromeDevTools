@@ -15,7 +15,7 @@ namespace Tera.ChromeDevTools.Tests
         public void ChromeOpenTest()
         {
             var prev = Process.GetProcessesByName("chrome");
-            Chrome c = new Chrome();
+            Chrome c = new Chrome(remoteDebuggingPort: 9991);
             var post = Process.GetProcessesByName("chrome");
             Assert.IsTrue(post.Length > prev.Length, "No chrome processes were created on the initialization of a Chrome instance");
             c.Dispose();
@@ -27,7 +27,7 @@ namespace Tera.ChromeDevTools.Tests
             Task.Run(async () =>
             {
 
-                Chrome c = new Chrome(headless: false);
+                Chrome c = new Chrome(remoteDebuggingPort: 9992, headless: false);
 
                 var currentSessions = await c.GetActiveSessions();
                 var s = await c.CreateNewSession();
@@ -41,18 +41,34 @@ namespace Tera.ChromeDevTools.Tests
         {
             Task.Run(async () =>
             {
-                Chrome c = new Chrome(headless: false);
+                Chrome c = new Chrome(remoteDebuggingPort: 9993, headless: false);
+
+                await c.CreateNewSession();
                 var currentSessions = await c.GetActiveSessions();
-                if (currentSessions.Count() == 0)
-                {
-                    await c.CreateNewSession();
-                    currentSessions = await c.GetActiveSessions();
-                }
+
                 await c.CloseSession(currentSessions.First());
                 var newSessions = await c.GetActiveSessions();
                 Assert.IsTrue(currentSessions.Count() - 1 == newSessions.Count(), "The number of sessions before closing - 1 was not equal to the sessions found later");
                 c.Dispose();
             }).GetAwaiter().GetResult();
+        }
+
+
+        [TestMethod]
+        public async Task NavigateTest()
+        {
+            using (Chrome c = new Chrome(remoteDebuggingPort: 9994, headless: false))
+            {
+
+                bool reached = false;
+                var session = await c.CreateNewSession();
+                session.PageLoaded += (s, e) => { reached = true; };
+                await session.Navigate("http://www.google.com");
+                await Task.Delay(5000);
+                //if by now i do not have the result, something went wrong
+                Assert.IsTrue(reached, "The webpage was not reached during the time waited");
+            }
+
         }
     }
 
