@@ -29,17 +29,27 @@ namespace Tera.ChromeDevTools
 
 
         }
-        ~Chrome()
+
+        private void closeProcess()
         {
-            if (chromeProcess != null) { 
-                chromeProcess.Kill();
+            if (chromeProcess != null)
+            {
+                chromeProcess.CloseMainWindow();
+                if (!chromeProcess.WaitForExit(1000))
+                {
+                    chromeProcess.Kill();
+                }
+                chromeProcess.Dispose();
                 chromeProcess = null;
             }
         }
+        ~Chrome()
+        {
+            closeProcess();
+        }
         public void Dispose()
         {
-            chromeProcess.Dispose();
-            chromeProcess = null;
+            closeProcess();
         }
     }
 }
