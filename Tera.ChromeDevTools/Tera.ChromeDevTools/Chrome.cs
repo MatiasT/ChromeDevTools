@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Tera.ChromeDevTools
 {
-    public class Chrome
+    public class Chrome:IDisposable
     {
         private Process chromeProcess;
         private string directoryInfo;
@@ -25,11 +25,21 @@ namespace Tera.ChromeDevTools
                 chromeProcessArgs += " --headless";
             }
 
-            Process chromeProcess = Process.Start(ChromeUtils.GetChromePath(), chromeProcessArgs);
+            chromeProcess = Process.Start(ChromeUtils.GetChromePath(), chromeProcessArgs);
 
 
         }
-
-
+        ~Chrome()
+        {
+            if (chromeProcess != null) { 
+                chromeProcess.Kill();
+                chromeProcess = null;
+            }
+        }
+        public void Dispose()
+        {
+            chromeProcess.Dispose();
+            chromeProcess = null;
+        }
     }
 }
