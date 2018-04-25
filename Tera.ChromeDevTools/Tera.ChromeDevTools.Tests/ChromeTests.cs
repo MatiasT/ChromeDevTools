@@ -22,35 +22,29 @@ namespace Tera.ChromeDevTools.Tests
         }
 
         [TestMethod]
-        public void SessionCreationTest()
+        public async Task SessionCreationTest()
         {
-            Task.Run(async () =>
-            {
+            Chrome c = new Chrome(remoteDebuggingPort: 9992, headless: false);
 
-                Chrome c = new Chrome(remoteDebuggingPort: 9992, headless: false);
+            var currentSessions = await c.GetActiveSessions();
+            var s = await c.CreateNewSession();
+            var newSessions = await c.GetActiveSessions();
+            Assert.IsTrue(currentSessions.Count() + 1 == newSessions.Count(), "The number of sessions before creation + 1 was not equal to the sessions found later");
+            c.Dispose();
 
-                var currentSessions = await c.GetActiveSessions();
-                var s = await c.CreateNewSession();
-                var newSessions = await c.GetActiveSessions();
-                Assert.IsTrue(currentSessions.Count() + 1 == newSessions.Count(), "The number of sessions before creation + 1 was not equal to the sessions found later");
-                c.Dispose();
-            }).GetAwaiter().GetResult();
         }
         [TestMethod]
-        public void SessionClosingTest()
+        public async Task SessionClosingTest()
         {
-            Task.Run(async () =>
-            {
-                Chrome c = new Chrome(remoteDebuggingPort: 9993, headless: false);
+            Chrome c = new Chrome(remoteDebuggingPort: 9993, headless: false);
 
-                await c.CreateNewSession();
-                var currentSessions = await c.GetActiveSessions();
+            await c.CreateNewSession();
+            var currentSessions = await c.GetActiveSessions();
 
-                await c.CloseSession(currentSessions.First());
-                var newSessions = await c.GetActiveSessions();
-                Assert.IsTrue(currentSessions.Count() - 1 == newSessions.Count(), "The number of sessions before closing - 1 was not equal to the sessions found later");
-                c.Dispose();
-            }).GetAwaiter().GetResult();
+            await c.CloseSession(currentSessions.First());
+            var newSessions = await c.GetActiveSessions();
+            Assert.IsTrue(currentSessions.Count() - 1 == newSessions.Count(), "The number of sessions before closing - 1 was not equal to the sessions found later");
+            c.Dispose();
         }
 
 
