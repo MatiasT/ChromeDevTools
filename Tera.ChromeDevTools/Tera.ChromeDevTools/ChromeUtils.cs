@@ -11,7 +11,10 @@ namespace Tera.ChromeDevTools
         public static string GetChromePath() {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe";
+                return Microsoft.Win32.Registry
+                    .LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe")
+                    .GetValue("").ToString();
+                
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
