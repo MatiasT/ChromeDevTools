@@ -21,13 +21,13 @@ namespace Tera.ChromeDevTools
             this.Id = chromeSessionInfo.Id;
             internalSession = new BaristaLabs.ChromeDevTools.Runtime.ChromeSession(chromeSessionInfo.WebSocketDebuggerUrl);
             this.chrome = chrome;
-            InitializePage();
+            Task.WaitAll(InitializePage());
         }
 
-        private void InitializePage()
+        private async Task InitializePage()
         {
             //enables events.
-            internalSession.Page.Enable();
+            await internalSession.Page.Enable();
             internalSession.Page.SubscribeToLoadEventFiredEvent((evt) =>
             {
                 //this should trigger when a page loads.
@@ -35,8 +35,9 @@ namespace Tera.ChromeDevTools
             });
         }
 
-        public async Task Navigate(string Url) {
-           var result =   await internalSession.Page.Navigate(new BaristaLabs.ChromeDevTools.Runtime.Page.NavigateCommand() { Url = Url });
+        public async Task Navigate(string Url)
+        {
+            var result = await internalSession.Page.Navigate(new BaristaLabs.ChromeDevTools.Runtime.Page.NavigateCommand() { Url = Url });
             //todo(Tera): Maybe return something here? like the body, update the title, or whatever?
         }
         #region cleanup
