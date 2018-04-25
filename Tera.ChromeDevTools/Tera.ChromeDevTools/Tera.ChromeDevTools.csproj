@@ -4,4 +4,8 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="BaristaLabs.ChromeDevTools.Runtime" Version="66.0.3359.117" />
+  </ItemGroup>
+
 </Project>
