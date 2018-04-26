@@ -14,7 +14,7 @@ namespace Tera.ChromeDevTools
         public delegate void PageLoadedEventHandler(ChromeSession session, double Timestamp);
         public event PageLoadedEventHandler PageLoaded;
 
-        public async Task<T> Eval<T>(string v) where T : struct
+        private async Task<T> evalValue<T>(string v) 
         {
             var result = await internalSession.Runtime.Evaluate(new BaristaLabs.ChromeDevTools.Runtime.Runtime.EvaluateCommand() { Expression = v });
             if (result.ExceptionDetails != null)
@@ -22,9 +22,23 @@ namespace Tera.ChromeDevTools
                 //TODO(Tera):do something with the error
                 throw new NotImplementedException();
             }
-            return (T) Convert.ChangeType(result.Result.Value, typeof(T));
-        }
+            return (T)Convert.ChangeType(result.Result.Value, typeof(T));
 
+        }
+        private async Task<T> eval<T>(string v) {
+            return default;
+        }
+        public async Task<T> Eval<T>(string v)
+        {
+
+            if (typeof(T).IsValueType)
+            {
+                 return await evalValue<T>(v);
+            }
+            else {
+                return await eval<T>(v);
+            }
+        }
         private BaristaLabs.ChromeDevTools.Runtime.ChromeSession internalSession;
         private readonly Chrome chrome;
 
