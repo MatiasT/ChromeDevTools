@@ -17,7 +17,7 @@ namespace Tera.ChromeDevTools.Tests
             using (Chrome c = new Chrome())
             {
                 var s = await c.CreateNewSession();
-                int result = await s.Eval<int>("7");
+                int result = await s.EvalValue<int>("7");
                 Assert.AreEqual(7, result, "The received result did not match the expected result");
             }
         }
@@ -27,7 +27,7 @@ namespace Tera.ChromeDevTools.Tests
             using (Chrome c = new Chrome())
             {
                 var s = await c.CreateNewSession();
-                bool result = await s.Eval<bool>("true");
+                bool result = await s.EvalValue<bool>("true");
                 Assert.AreEqual(true, result, "The received result did not match the expected result");
             }
         }
@@ -37,7 +37,7 @@ namespace Tera.ChromeDevTools.Tests
             using (Chrome c = new Chrome())
             {
                 var s = await c.CreateNewSession();
-                double result = await s.Eval<double>("7.3543");
+                double result = await s.EvalValue<double>("7.3543");
                 Assert.AreEqual(7.3543, result, "The received result did not match the expected result");
             }
         }
@@ -49,7 +49,7 @@ namespace Tera.ChromeDevTools.Tests
             {
                 int[] expected = new int[] { 1, 2, 3, 4, 5 };
                 var s = await c.CreateNewSession();
-                var result = await s.Eval<IEnumerable<int>>("[1, 2, 3, 4, 5]");
+                IEnumerable<int> result = await s.EvalEnumerable<int>("[1, 2, 3, 4, 5]");
                 Assert.IsTrue(expected.SequenceEqual(result), "The received result did not match the expected result");
             }
 
@@ -61,22 +61,42 @@ namespace Tera.ChromeDevTools.Tests
             {
                 object[] expected = new object[] { 1, true, "asd" };
                 var s = await c.CreateNewSession();
-                var result = await s.Eval<IEnumerable<object>>("[1, true, 'asd']");
+                IEnumerable<object> result = await s.EvalEnumerable<object>("[1, true, 'asd']");
                 Assert.IsTrue(expected.SequenceEqual(result), "The received result did not match the expected result");
             }
         }
         [TestMethod]
-        public async Task literalObjectEvalTest()
+        public async Task ObjectLiteralEvalTest()
         {
-            using (Chrome c = new Chrome())
+            using (Chrome c = new Chrome(headless: false))
             {
                 Point expected = new Point(10, 3);
                 var s = await c.CreateNewSession();
-                var result = await s.Eval<Point>("{'x':10,'y':3}");
-                Assert.AreEqual(expected,result, "The received result did not match the expected result");
+                var result = await s.EvalObject("var a ={ 'X' : 10, 'Y' : 3}; a;");
+                Assert.AreEqual(expected.X, result.X, "The received result did not match the expected result");
+                Assert.AreEqual(expected.Y, result.Y, "The received result did not match the expected result");
             }
 
         }
+        [TestMethod]
+        public async Task ObjectRecursionEvalTest()
+        {
+            using (Chrome c = new Chrome(headless:false))
+            {
 
+                var s = await c.CreateNewSession();
+                //doStuff
+                await s.EvalObject("var a ={'x':10};");
+                await s.EvalObject("var b = {'x':5};");
+                var a = await s.EvalObject("a");
+                var b = await s.EvalObject("b");
+                await s.EvalObject("a.other = b; b.other = a; ");
+                var eq = await s.EvalValue<bool>("a===b.other");
+                var p = b.other;
+                Assert.AreEqual(a, b.other, "The received result did not match the expected result");
+                Assert.AreEqual(b, a.other, "The received result did not match the expected result");
+            }
+
+        }
     }
 }

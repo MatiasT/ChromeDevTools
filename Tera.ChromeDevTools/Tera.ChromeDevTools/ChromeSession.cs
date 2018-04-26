@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Tera.ChromeDevTools.Protocol;
 
@@ -14,7 +15,7 @@ namespace Tera.ChromeDevTools
         public delegate void PageLoadedEventHandler(ChromeSession session, double Timestamp);
         public event PageLoadedEventHandler PageLoaded;
 
-        private async Task<T> evalValue<T>(string v) 
+        public async Task<T> EvalValue<T>(string v) where T:struct
         {
             var result = await internalSession.Runtime.Evaluate(new BaristaLabs.ChromeDevTools.Runtime.Runtime.EvaluateCommand() { Expression = v });
             if (result.ExceptionDetails != null)
@@ -23,21 +24,20 @@ namespace Tera.ChromeDevTools
                 throw new NotImplementedException();
             }
             return (T)Convert.ChangeType(result.Result.Value, typeof(T));
-
         }
-        private async Task<T> eval<T>(string v) {
-            return default;
-        }
-        public async Task<T> Eval<T>(string v)
-        {
-
-            if (typeof(T).IsValueType)
+        public async Task<dynamic> EvalObject(string v) {
+            var result = await internalSession.Runtime.Evaluate(new BaristaLabs.ChromeDevTools.Runtime.Runtime.EvaluateCommand() { Expression = v });
+            if (result.ExceptionDetails != null)
             {
-                 return await evalValue<T>(v);
+                //TODO(Tera):do something with the error
+                throw new NotImplementedException();
             }
-            else {
-                return await eval<T>(v);
-            }
+            return   DynamicObjectResult.Get(result,this);
+        }
+
+        public Task<IEnumerable<T>> EvalEnumerable<T>(string v)
+        {
+            throw new NotImplementedException();
         }
         private BaristaLabs.ChromeDevTools.Runtime.ChromeSession internalSession;
         private readonly Chrome chrome;
@@ -53,7 +53,9 @@ namespace Tera.ChromeDevTools
         private async Task InitializePage()
         {
             //enables events.
+
             await internalSession.Page.Enable();
+           await Task.Delay(100);
             internalSession.Page.SubscribeToLoadEventFiredEvent((evt) =>
             {
                 //this should trigger when a page loads.
@@ -61,11 +63,17 @@ namespace Tera.ChromeDevTools
             });
         }
 
+
         public async Task Navigate(string Url)
         {
             var result = await internalSession.Page.Navigate(new BaristaLabs.ChromeDevTools.Runtime.Page.NavigateCommand() { Url = Url });
             //todo(Tera): Maybe return something here? like the body, update the title, or whatever?
         }
+
+        internal async Task<BaristaLabs.ChromeDevTools.Runtime.Runtime.GetPropertiesCommandResponse>  InspectObject(string ObjectId) {
+            return await internalSession.Runtime.GetProperties(new BaristaLabs.ChromeDevTools.Runtime.Runtime.GetPropertiesCommand() { ObjectId = ObjectId });
+        }
+
         #region cleanup
         ~ChromeSession()
         {

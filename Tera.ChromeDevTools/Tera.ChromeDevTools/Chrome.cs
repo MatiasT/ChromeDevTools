@@ -32,6 +32,7 @@ namespace Tera.ChromeDevTools
             }
 
             chromeProcess = Process.Start(ChromeUtils.GetChromePath(), chromeProcessArgs);
+            System.Threading.Thread.Sleep(100);
             aliveSessions = new Dictionary<string, ChromeSession>();
 
         }
