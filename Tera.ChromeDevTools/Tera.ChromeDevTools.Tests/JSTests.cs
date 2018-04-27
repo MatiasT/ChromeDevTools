@@ -78,25 +78,6 @@ namespace Tera.ChromeDevTools.Tests
             }
 
         }
-        [TestMethod]
-        public async Task ObjectRecursionEvalTest()
-        {
-            using (Chrome c = new Chrome(headless:false))
-            {
-
-                var s = await c.CreateNewSession();
-                //doStuff
-                await s.EvalObject("var a ={'x':10};");
-                await s.EvalObject("var b = {'x':5};");
-                var a = await s.EvalObject("a");
-                var b = await s.EvalObject("b");
-                await s.EvalObject("a.other = b; b.other = a; ");
-                var eq = await s.EvalValue<bool>("a===b.other");
-                var p = b.other;
-                Assert.AreEqual(a, b.other, "The received result did not match the expected result");
-                Assert.AreEqual(b, a.other, "The received result did not match the expected result");
-            }
-
-        }
+       
     }
 }
