@@ -9,15 +9,10 @@ namespace Tera.ChromeDevTools
 {
     public class DynamicObjectResult : DynamicObject
     {
-        static Dictionary<string, WeakReference<DynamicObjectResult>> instances;
-        private string objectId;
+         private string objectId;
         private readonly ChromeSession session;
 
-        static DynamicObjectResult()
-        {
-            instances = new Dictionary<string, WeakReference<DynamicObjectResult>>();
-        }
-
+  
         public DynamicObjectResult(string objectId, ChromeSession session)
         {
             this.objectId = objectId;
@@ -37,14 +32,8 @@ namespace Tera.ChromeDevTools
         {
             if (value.Type == "undefined") return null;
 
-            if (instances.ContainsKey(value.ObjectId) &&
-                  instances[value.ObjectId].TryGetTarget(out DynamicObjectResult live))
-            {
-                return live;
-            }
-            DynamicObjectResult instance = new DynamicObjectResult(value.ObjectId, session);
-            instances.Add(value.ObjectId, new WeakReference<DynamicObjectResult>(instance));
-            return instance;
+           
+           return new DynamicObjectResult(value.ObjectId, session); 
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
