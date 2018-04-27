@@ -7,7 +7,7 @@ using BaristaLabs.ChromeDevTools.Runtime.Runtime;
 
 namespace Tera.ChromeDevTools
 {
-    public class DynamicObjectResult : DynamicObject
+    public class DynamicObjectResult : DynamicObject,IDisposable
     {
          private string objectId;
         private readonly ChromeSession session;
@@ -58,7 +58,14 @@ namespace Tera.ChromeDevTools
             result = null;
             return false;
         }
-
-
+        ~DynamicObjectResult()
+        {
+            Dispose();
+        }
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            session.RemoveObject(objectId).GetAwaiter().GetResult();
+        }
     }
 }

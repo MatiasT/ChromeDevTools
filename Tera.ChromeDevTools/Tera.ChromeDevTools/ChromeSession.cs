@@ -15,7 +15,7 @@ namespace Tera.ChromeDevTools
         public delegate void PageLoadedEventHandler(ChromeSession session, double Timestamp);
         public event PageLoadedEventHandler PageLoaded;
 
-        public async Task<T> EvalValue<T>(string v) where T:struct
+        public async Task<T> EvalValue<T>(string v) where T : struct
         {
             var result = await internalSession.Runtime.Evaluate(new BaristaLabs.ChromeDevTools.Runtime.Runtime.EvaluateCommand() { Expression = v });
             if (result.ExceptionDetails != null)
@@ -25,14 +25,15 @@ namespace Tera.ChromeDevTools
             }
             return (T)Convert.ChangeType(result.Result.Value, typeof(T));
         }
-        public async Task<dynamic> EvalObject(string v) {
+        public async Task<dynamic> EvalObject(string v)
+        {
             var result = await internalSession.Runtime.Evaluate(new BaristaLabs.ChromeDevTools.Runtime.Runtime.EvaluateCommand() { Expression = v });
             if (result.ExceptionDetails != null)
             {
                 //TODO(Tera):do something with the error
                 throw new NotImplementedException();
             }
-            return   DynamicObjectResult.Get(result,this);
+            return DynamicObjectResult.Get(result, this);
         }
 
         public Task<IEnumerable<T>> EvalEnumerable<T>(string v)
@@ -55,7 +56,7 @@ namespace Tera.ChromeDevTools
             //enables events.
 
             await internalSession.Page.Enable();
-           await Task.Delay(100);
+            await Task.Delay(100);
             internalSession.Page.SubscribeToLoadEventFiredEvent((evt) =>
             {
                 //this should trigger when a page loads.
@@ -63,6 +64,10 @@ namespace Tera.ChromeDevTools
             });
         }
 
+        internal async Task RemoveObject(string objectId)
+        {
+            await internalSession.Runtime.ReleaseObject(new BaristaLabs.ChromeDevTools.Runtime.Runtime.ReleaseObjectCommand() { ObjectId = objectId });
+        }
 
         public async Task Navigate(string Url)
         {
@@ -70,7 +75,8 @@ namespace Tera.ChromeDevTools
             //todo(Tera): Maybe return something here? like the body, update the title, or whatever?
         }
 
-        internal async Task<BaristaLabs.ChromeDevTools.Runtime.Runtime.GetPropertiesCommandResponse>  InspectObject(string ObjectId) {
+        internal async Task<BaristaLabs.ChromeDevTools.Runtime.Runtime.GetPropertiesCommandResponse> InspectObject(string ObjectId)
+        {
             return await internalSession.Runtime.GetProperties(new BaristaLabs.ChromeDevTools.Runtime.Runtime.GetPropertiesCommand() { ObjectId = ObjectId });
         }
 
