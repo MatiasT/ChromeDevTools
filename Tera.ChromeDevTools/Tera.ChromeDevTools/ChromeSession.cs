@@ -66,7 +66,7 @@ namespace Tera.ChromeDevTools
 
         internal async Task RemoveObject(string objectId)
         {
-            await internalSession.Runtime.ReleaseObject(new BaristaLabs.ChromeDevTools.Runtime.Runtime.ReleaseObjectCommand() { ObjectId = objectId });
+            await internalSession?.Runtime.ReleaseObject(new BaristaLabs.ChromeDevTools.Runtime.Runtime.ReleaseObjectCommand() { ObjectId = objectId });
         }
 
         public async Task Navigate(string Url)
