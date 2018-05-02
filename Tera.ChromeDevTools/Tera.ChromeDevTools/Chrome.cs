@@ -11,13 +11,22 @@ using Tera.ChromeDevTools.Protocol;
 
 namespace Tera.ChromeDevTools
 {
+    /// <summary>
+    /// Represents a Chrome instance.
+    /// Might not work if you try to open several instances on the same port.
+    /// 
+    /// </summary>
     public class Chrome : IDisposable
     {
         private Process chromeProcess;
         private string directoryInfo;
         private int remoteDebuggingPort;
         private Dictionary<string, ChromeSession> aliveSessions;
-
+        /// <summary>
+        /// Initializes an instance of Chrome
+        /// </summary>
+        /// <param name="remoteDebuggingPort">The port provided for the remote debugger</param>
+        /// <param name="headless">indicates if the window should be hidden</param>
         public Chrome(int remoteDebuggingPort = 9222, bool headless = true)
         {
             directoryInfo = ChromeUtils.CreateTempFolder();
@@ -38,7 +47,10 @@ namespace Tera.ChromeDevTools
         }
 
          
-
+        /// <summary>
+        /// Ennumerates the available sessions(tabs) 
+        /// </summary>
+        /// <returns>A collection of ChromeSessions</returns>
         public async Task<IEnumerable<ChromeSession>> GetActiveSessions()
         {
             using (var webClient = GetDebuggerClient())
@@ -70,6 +82,10 @@ namespace Tera.ChromeDevTools
             aliveSessions.Add(session.Id, session);
             return session;
         }
+        /// <summary>
+        /// Creates and returns a new Session (Tab)
+        /// </summary>
+        /// <returns>The newly created Session</returns>
         public async Task<ChromeSession> CreateNewSession()
         {
             using (var webClient = GetDebuggerClient())
@@ -79,7 +95,11 @@ namespace Tera.ChromeDevTools
                 return addSession(JsonConvert.DeserializeObject<ChromeSessionInfo>(contents));
             }
         }
-
+        /// <summary>
+        /// Closes the provided Session(Tab)
+        /// </summary>
+        /// <param name="session">Session to be closed</param>
+        /// <returns></returns>
         public async Task CloseSession(ChromeSession session)
         {
             //TODO(Tera):if i close all the sessions, chrome closes itself! i can use this to gracefully close this stuff, OR maybe i should prevent it?
@@ -135,6 +155,10 @@ namespace Tera.ChromeDevTools
             closeSessions();
             closeProcess();
         }
+
+        /// <summary>
+        /// Closes the active sessions & finalizes the process created by this instance
+        /// </summary>
         public void Dispose()
         {
             closeSessions();
