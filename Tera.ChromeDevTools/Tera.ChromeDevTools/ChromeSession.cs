@@ -124,8 +124,7 @@ namespace Tera.ChromeDevTools
 
         }
         public void Dispose()
-        {
-            innerDispose();
+        { 
             chrome.CloseSession(this).GetAwaiter().GetResult();
         }
         #endregion

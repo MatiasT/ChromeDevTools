@@ -6,9 +6,9 @@
     <PackageProjectUrl>https://github.com/MatiasT/ChromeDevTools</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MatiasT/ChromeDevTools</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/MatiasT/ChromeDevTools/blob/master/LICENSE</PackageLicenseUrl>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
-    <PackageReleaseNotes>Now showing errors that happened because an eval.</PackageReleaseNotes>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
+    <PackageReleaseNotes>Fixed error on session.dispose</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

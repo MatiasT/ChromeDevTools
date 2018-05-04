@@ -47,6 +47,21 @@ namespace Tera.ChromeDevTools.Tests
             c.Dispose();
         }
 
+        [TestMethod]
+        public async Task SessionDisposeTest()
+        {
+            using (Chrome c = new Chrome(remoteDebuggingPort: 9994, headless: false))
+            {
+
+                var currentSessions = await c.GetActiveSessions();
+                var s = await c.CreateNewSession();
+
+                s.Dispose();
+
+                var currentSessions2 = await c.GetActiveSessions();
+                Assert.AreEqual(currentSessions.Count(), currentSessions2.Count(), 0, "The session created was not destroyed when disposed");
+            }
+        }
 
         [TestMethod]
         public async Task NavigateTest()
