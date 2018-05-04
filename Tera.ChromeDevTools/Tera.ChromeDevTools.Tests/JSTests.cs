@@ -77,7 +77,40 @@ namespace Tera.ChromeDevTools.Tests
                 Assert.AreEqual(expected.Y, result.Y, "The received result did not match the expected result");
             }
 
+        } 
+
+        [TestMethod]
+        public async Task ExceptionTest()
+        {
+            using (Chrome c = new Chrome())
+            {
+                var s = await c.CreateNewSession();
+
+                bool failed = false;
+                string reason = "";
+                string stack = "";
+                //this should cause an error because foo is not defined
+                try
+                {
+                    var result = await s.EvalValue<int>("foo");
+
+                }
+                catch (ChromeRemoteException ex) {
+                    failed = true;
+                    reason=ex.Message;
+                    stack = ex.RemoteStackTrace;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                
+
+                Assert.IsTrue(failed, "There was supposed to be an exception!");
+                Assert.IsTrue(reason.Contains("foo is not defined"), "The error does not contain the correct description");
+            }
+
+
         }
-       
     }
 }

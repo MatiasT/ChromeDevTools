@@ -6,6 +6,8 @@
     <PackageProjectUrl>https://github.com/MatiasT/ChromeDevTools</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MatiasT/ChromeDevTools</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/MatiasT/ChromeDevTools/blob/master/LICENSE</PackageLicenseUrl>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

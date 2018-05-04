@@ -44,8 +44,7 @@ namespace Tera.ChromeDevTools
             var result = await internalSession.Runtime.Evaluate(new BaristaLabs.ChromeDevTools.Runtime.Runtime.EvaluateCommand() { Expression = v });
             if (result.ExceptionDetails != null)
             {
-                //TODO(Tera):do something with the error
-                throw new NotImplementedException();
+                throw new ChromeRemoteException(result.ExceptionDetails);
             }
             return (T)Convert.ChangeType(result.Result.Value, typeof(T));
         }
@@ -59,8 +58,7 @@ namespace Tera.ChromeDevTools
             var result = await internalSession.Runtime.Evaluate(new BaristaLabs.ChromeDevTools.Runtime.Runtime.EvaluateCommand() { Expression = v });
             if (result.ExceptionDetails != null)
             {
-                //TODO(Tera):do something with the error
-                throw new NotImplementedException();
+                throw new ChromeRemoteException(result.ExceptionDetails);
             }
             return DynamicObjectResult.Get(result, this);
         }

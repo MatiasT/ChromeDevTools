@@ -23,8 +23,7 @@ namespace Tera.ChromeDevTools
         {
             if (result.ExceptionDetails != null)
             {
-                //TODO(Tera): what do we do here? Error handling?
-                throw new NotImplementedException();
+                throw new ChromeRemoteException(result.ExceptionDetails);
             }
             return Get(result.Result, session);
         }
@@ -40,8 +39,7 @@ namespace Tera.ChromeDevTools
             var properties = session.InspectObject(this.objectId).GetAwaiter().GetResult();
             if (properties.ExceptionDetails != null)
             {
-                //TODO(Tera): what do we do here? Error handling?
-                throw new NotImplementedException();
+                throw new ChromeRemoteException(properties.ExceptionDetails);
             }
 
             dynamic property = properties.Result.FirstOrDefault(p => p.Name == binder.Name);
